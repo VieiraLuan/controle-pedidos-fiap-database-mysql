@@ -31,10 +31,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan \
-          -var "admin_username=$MYSQL_ADMIN_USERNAME" \
-          -var "admin_password=$MYSQL_ADMIN_PASSWORD" \
-          -out=tfplan
+        run: terraform plan -var "admin_username=$MYSQL_ADMIN_USERNAME" -var "admin_password=$MYSQL_ADMIN_PASSWORD" -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
