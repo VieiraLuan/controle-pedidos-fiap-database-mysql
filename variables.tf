@@ -12,16 +12,19 @@ variable "mysql_server_name" {
   type = string
 }
 
-variable "admin_username" {
-  type = string
-}
-
-variable "admin_password" {
-  type = string
-  sensitive = true
-}
-
 variable "database_name" {
   type    = string
   default = "controlepedidosdb"
+}
+
+variable "admin_username" {
+  type    = string
+  sensitive = true
+  default = ""
+}
+
+variable "admin_password" {
+  type    = string
+  sensitive = true
+  default = ""
 }
