@@ -1,10 +1,12 @@
 name: Controle-Pedidos-MySQL-Terraform
 
 on:
+  pull_request:
+    branches:
+      - main   
   push:
     branches:
-      - main
-  pull_request:
+      - main   
 
 jobs:
   terraform:
@@ -17,6 +19,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       MYSQL_ADMIN_USERNAME: ${{ secrets.MYSQL_ADMIN_USERNAME }}
       MYSQL_ADMIN_PASSWORD: ${{ secrets.MYSQL_ADMIN_PASSWORD }}
+      MYSQL_SERVER_NAME: ${{ secrets.MYSQL_SERVER_NAME }}
 
     steps:
       - name: Checkout
@@ -31,7 +34,7 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -var "admin_username=$MYSQL_ADMIN_USERNAME" -var "admin_password=$MYSQL_ADMIN_PASSWORD" -out=tfplan
+        run: terraform plan  -var "mysql_server_name=$MYSQL_SERVER_NAME" -var "admin_username=$MYSQL_ADMIN_USERNAME" -var "admin_password=$MYSQL_ADMIN_PASSWORD" -out=tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
