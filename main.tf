@@ -13,9 +13,12 @@ resource "azurerm_mysql_flexible_server" "mysql_server" {
 
   backup_retention_days        = 7
   geo_redundant_backup_enabled = false
+}
 
-  # Se quiser HA, use ZoneRedundant ou SameZone
-  # high_availability {
-  #   mode = "ZoneRedundant"
-  # }
+resource "azurerm_mysql_flexible_database" "db" {
+  name                = var.database_name
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_flexible_server.mysql_server.name
+  charset             = "utf8"
+  collation           = "utf8_general_ci"
 }
