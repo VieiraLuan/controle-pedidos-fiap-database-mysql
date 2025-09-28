@@ -37,11 +37,7 @@ jobs:
           terraform_version: 1.3.0
 
       - name: Terraform Init
-        run: terraform init \
-          -backend-config="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" \
-          -backend-config="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
-          -backend-config="container_name=${{ env.CONTAINER_NAME }}" \
-          -backend-config="key=mysql.tfstate"
+        run: terraform init -backend-config="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=${{ env.CONTAINER_NAME }}" -backend-config="key=mysql.tfstate"
 
       - name: Terraform Plan
         run: terraform plan \
