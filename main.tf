@@ -8,12 +8,11 @@ resource "azurerm_mysql_flexible_server" "mysql_server" {
   sku_name               = "B_Standard_B1ms"
 
   storage {
-    size_gb = 5 # 5120 MB = 5 GB
+    size_gb = 5
   }
 
-  backup {
-    backup_retention_days = 7
-  }
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = false
 
   high_availability {
     mode = "Disabled"
@@ -23,8 +22,9 @@ resource "azurerm_mysql_flexible_server" "mysql_server" {
 }
 
 resource "azurerm_mysql_flexible_database" "db" {
-  name      = var.database_name
-  server_id = azurerm_mysql_flexible_server.mysql_server.id
-  charset   = "utf8"
-  collation = "utf8_general_ci"
+  name                = var.database_name
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mysql_flexible_server.mysql_server.name
+  charset             = "utf8"
+  collation           = "utf8_general_ci"
 }
