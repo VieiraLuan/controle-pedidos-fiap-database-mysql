@@ -21,4 +21,5 @@ output "mysql_connection_info" {
     user     = var.admin_username
   }
   description = "Informações de conexão do MySQL"
+  sensitive   = true
 }
