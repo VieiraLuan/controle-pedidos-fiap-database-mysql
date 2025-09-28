@@ -5,9 +5,11 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - main
+      - feature/*
   push:
     branches:
       - main
+      - feature/*
 
 jobs:
   terraform:
