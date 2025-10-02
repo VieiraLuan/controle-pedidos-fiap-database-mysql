@@ -2,34 +2,36 @@ name: Controle-Pedidos-MySQL-Terraform
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
     branches:
-      - master
-      - feature/*
+      - master   
   push:
     branches:
-      - master
-      - feature/*
+      - master 
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
     env:
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       MYSQL_ADMIN_USERNAME: ${{ secrets.MYSQL_ADMIN_USERNAME }}
       MYSQL_ADMIN_PASSWORD: ${{ secrets.MYSQL_ADMIN_PASSWORD }}
       MYSQL_SERVER_NAME: ${{ secrets.MYSQL_SERVER_NAME }}
       STORAGE_ACCOUNT_NAME: ${{ secrets.STORAGE_ACCOUNT_NAME }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      ARM_CLIENT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+      ARM_CLIENT_SECRET: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+      ARM_SUBSCRIPTION_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
+      ARM_TENANT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -37,18 +39,25 @@ jobs:
           terraform_version: 1.3.0
 
       - name: Terraform Init
-        run: terraform init \
-          -backend-config="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" \
-          -backend-config="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
-          -backend-config="container_name=${{ env.CONTAINER_NAME }}" \
-          -backend-config="key=mysql.tfstate"
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ env.CONTAINER_NAME }}" \
+            -backend-config="key=mysql.tfstate"      
 
       - name: Terraform Plan
-        run: terraform plan \
-          -var "mysql_server_name=${{ env.MYSQL_SERVER_NAME }}" \
-          -var "admin_username=${{ env.MYSQL_ADMIN_USERNAME }}" \
-          -var "admin_password=${{ env.MYSQL_ADMIN_PASSWORD }}" \
-          -out=tfplan
+        if: github.event_name == 'pull_request'
+        run: |
+          terraform plan \
+            -var="mysql_server_name=${{ env.MYSQL_SERVER_NAME }}" \
+            -var="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" \
+            -var="admin_username=${{ env.MYSQL_ADMIN_USERNAME }}" \
+            -var="admin_password=${{ env.MYSQL_ADMIN_PASSWORD }}" \
+            -var="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
+            -var="container_name=${{ env.CONTAINER_NAME }}" \
+            -out=tfplan
+
 
       - name: Upload plan as artifact (PR only)
         if: github.event_name == 'pull_request'
@@ -57,6 +66,6 @@ jobs:
           name: terraform-plan
           path: tfplan
 
-      - name: Terraform Apply
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Terraform Apply (master only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: terraform apply -auto-approve tfplan

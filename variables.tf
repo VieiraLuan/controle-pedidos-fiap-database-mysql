@@ -6,7 +6,7 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
-  default     = "eastus"
+  default     = "eastus2"
   description = "Região do Azure"
 }
 
@@ -37,4 +37,9 @@ variable "container_name" {
   type        = string
   default     = "tfstate"
   description = "Nome do container para armazenar o Terraform state"
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "Storage Account used for Terraform backend"
 }
