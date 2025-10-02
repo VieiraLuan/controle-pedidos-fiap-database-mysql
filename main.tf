@@ -5,7 +5,7 @@ resource "azurerm_mysql_flexible_server" "mysql_server" {
   version                = "8.0.21"
   administrator_login    = var.admin_username
   administrator_password = var.admin_password
-  sku_name               = "B_Standard_B1ms"
+  sku_name               = "Standard_B1ms"   # Dev/Test workload
 
   storage {
     size_gb = 20
