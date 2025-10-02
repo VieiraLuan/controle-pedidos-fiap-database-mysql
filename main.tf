@@ -6,12 +6,11 @@ resource "azurerm_mysql_server" "mysql_server" {
   administrator_login_password = var.admin_password
   version = "8.0.21"
   sku_name   = "B_Gen5_1"  
-
-  storage 
-  {
+  
+  storage {
     size_gb = 20
-  }       
-
+  }
+  
   backup_retention_days = 7
   geo_redundant_backup  = "Disabled"
   auto_grow_enabled     = true
