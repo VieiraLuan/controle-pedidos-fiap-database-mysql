@@ -54,7 +54,10 @@ jobs:
             -var="resource_group_name=${{ env.AZURE_RESOURCE_GROUP }}" \
             -var="admin_username=${{ env.MYSQL_ADMIN_USERNAME }}" \
             -var="admin_password=${{ env.MYSQL_ADMIN_PASSWORD }}" \
+            -var="storage_account_name=${{ env.STORAGE_ACCOUNT_NAME }}" \
+            -var="container_name=${{ env.CONTAINER_NAME }}" \
             -out=tfplan
+
 
       - name: Upload plan as artifact (PR only)
         if: github.event_name == 'pull_request'
