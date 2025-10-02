@@ -5,7 +5,7 @@ resource "azurerm_mysql_server" "mysql_server" {
 
   administrator_login          = var.admin_username
   administrator_login_password = var.admin_password
-  version                      = "8.0.21"
+  version                      = "8.0"
   sku_name                     = "B_Gen5_1"
 
   storage_mb                    = 20480
